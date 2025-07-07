@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Profile - PulseConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(-45deg, #ff4e50, #f9d423, #24c6dc, #5433ff);
+      background-size: 600% 600%;
+      animation: rainbowGradient 10s ease infinite;
+      color: #f5f5f5;
+      overflow-x: hidden;
+      height: 100vh;
+    }
+    @keyframes rainbowGradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .form-container {
+      max-width: 450px;
+      margin: 60px auto;
+      padding: 30px;
+      background-color: #1e1e1e;
+      border-radius: 1rem;
+      position: relative;
+      z-index: 10;
+    }
+    .profile-pic {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid #ff5c8a;
+    }
+    .btn-primary {
+      background-color: #ff5c8a;
+      border: none;
+    }
+    .btn-primary:hover {
+      background-color: #ff326e;
+    }
+    .preview-img {
+      display: none;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 15px;
+    }
+    /* Pulse Background Effect */
+    .pulse-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .pulse-line {
+      position: absolute;
+      top: 50%;
+      width: 200%;
+      height: 3px;
+    }
+    .pulse-line::before {
+      content: "";
+      display: block;
+      width: 400%;
+      height: 3px;
+      background: linear-gradient(
+        to right,
+        transparent 0%, #ff5c8a 10%,
+        transparent 20%, #ff5c8a 22%,
+        transparent 30%, #ff5c8a 35%,
+        transparent 100%
+      );
+      animation: pulseMove 3s linear infinite;
+      box-shadow: 0 0 10px #ff5c8a;
+    }
+    @keyframes pulseMove {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(-150%); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Pulse line animated background -->
+<div class="pulse-background">
+  <div class="pulse-line"></div>
+</div>
+
+<div class="form-container">
+  <h4 class="text-center mb-4">Edit Your Profile</h4>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Profile Picture -->
+    {% if profile.profile_pic %}
+      <img id="currentPic" src="{{ profile.profile_pic.url }}" class="profile-pic" alt="Current Profile Pic">
+    {% else %}
+      <img id="currentPic" src="{% static 'images/default_user.png' %}" class="profile-pic" alt="Default Profile Pic">
+    {% endif %}
+
+    <div class="mb-3">
+      <label class="form-label">Change Profile Picture</label>
+      <input type="file" class="form-control" name="profile_pic" accept="image/*" id="profilePicInput">
+    </div>
+
+    <!-- New Preview -->
+    <img id="previewPic" class="preview-img" alt="Preview">
+
+    <!-- Bio -->
+    <div class="mb-3">
+      <label class="form-label">Bio</label>
+      <textarea class="form-control" name="bio" rows="3">{{ profile.bio }}</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+    <a href="{% url 'profile_view' request.user.id %}" class="btn btn-outline-light w-100 mt-2">Cancel</a>
+  </form>
+</div>
+
+<script>
+  const profilePicInput = document.getElementById('profilePicInput');
+  const previewPic = document.getElementById('previewPic');
+
+  profilePicInput.onchange = evt => {
+    const [file] = profilePicInput.files;
+    if (file) {
+      previewPic.src = URL.createObjectURL(file);
+      previewPic.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>

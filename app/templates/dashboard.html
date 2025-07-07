@@ -1,0 +1,714 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PulseConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    body {
+  background-color: #121212;
+  background-image: 
+    repeating-linear-gradient(
+      to right, 
+      rgba(255, 92, 138, 0.15) 0, 
+      rgba(255, 92, 138, 0.15) 1px, 
+      transparent 1px, 
+      transparent 50px
+    ),
+    repeating-linear-gradient(
+      to bottom, 
+      rgba(255, 92, 138, 0.15) 0, 
+      rgba(255, 92, 138, 0.15) 1px, 
+      transparent 1px, 
+      transparent 50px
+    );
+  animation: pulseLines 4s linear infinite;
+  color: #f5f5f5;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+@keyframes pulseLines {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 50px 50px, 50px 50px;
+  }
+}
+
+    .navbar-brand {
+      font-family: 'Arial Black';
+      font-size: 1.7rem;
+      color: #ff5c8a !important;
+      text-shadow: 0 0 10px #ff5c8a;
+    }
+.feed-container {
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 0 10px;
+}
+.card {
+  background: #1e1e1e;
+  border: none;
+  margin-bottom: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 92, 138, 0.05);
+}
+.post-img {
+  border-radius: 12px;
+  max-height: 500px;
+  object-fit: cover;
+}
+
+
+
+
+
+
+
+
+
+
+
+    
+    .post-img { border-radius: 8px; max-height: 400px; object-fit: cover; }
+    .save-btn { 
+      color: #f5f5f5;
+      font-size: 1.2rem;
+    }
+    .fab {
+      position: fixed; bottom: 30px; right: 30px;
+      background: #ff5c8a; color: white;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      font-size: 28px;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .comments-section {
+      margin-top: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .comment-item {
+      display: flex; justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 8px 12px; 
+      border-radius: 8px; 
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+    .comment-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .comment-input {
+      background: rgba(255, 92, 138, 0.1);
+      color: white !important;
+      border: 1px solid #ff5c8a;
+      border-radius: 20px;
+      padding: 8px 15px;
+      transition: all 0.3s ease;
+    }
+    .comment-input::placeholder {
+      color: rgba(255,255,255,0.7);
+    }
+    .comment-input:focus {
+      background: rgba(255, 92, 138, 0.2);
+      border-color: #ff5c8a;
+      box-shadow: 0 0 0 0.25rem rgba(255, 92, 138, 0.25);
+      outline: none;
+    }
+    .comment-form .btn-outline-primary {
+      border-color: #ff5c8a;
+      color: #ff5c8a;
+      margin-left: 8px;
+      border-radius: 20px;
+    }
+    .comment-form .btn-outline-primary:hover {
+      background-color: #ff5c8a;
+      color: white;
+    }
+    .delete-comment { 
+      color: #ff5c8a; 
+      background: rgba(255,92,138,0.1);
+      border: none; 
+      cursor: pointer; 
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+    .delete-comment:hover {
+      background: rgba(255,92,138,0.3);
+      transform: scale(1.05);
+    }
+    .comment-toggle { 
+      cursor: pointer;
+      font-size: 1.2rem;
+      color: white !important;
+    }
+    .comment-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .confirmation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .confirmation-modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .confirmation-box {
+      background: #2a2a2a;
+      padding: 25px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .like-btn-container {
+      display: flex;
+      align-items: center;
+      margin-right: 15px;
+    }
+    .like-btn {
+      font-size: 1.5rem;
+      color: #f5f5f5;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .like-btn:hover {
+      transform: scale(1.1);
+    }
+    .like-btn .bi-heart-fill {
+      transition: all 0.3s ease;
+    }
+    .like-btn .bi-heart-fill.text-danger {
+      color: #ff5c8a !important;
+    }
+    .like-count {
+      font-size: 1rem;
+      margin-left: 5px;
+      min-width: 20px;
+      display: inline-block;
+    }
+    .like-animation {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: 10rem;
+      color: #ff5c8a;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      animation: heartBeat 0.8s ease-out;
+    }
+    @keyframes heartBeat {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+      15% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+      30% { transform: translate(-50%, -50%) scale(0.95); }
+      45% { transform: translate(-50%, -50%) scale(1.1); }
+      60% { transform: translate(-50%, -50%) scale(0.98); }
+      75% { transform: translate(-50%, -50%) scale(1.05); }
+      100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+    }
+    
+    /* Three-dot menu styles */
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+    .post-options {
+      position: relative;
+    }
+    .post-options-btn {
+      background: none;
+      border: none;
+      color: #f5f5f5;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0.7;
+      transition: all 0.3s ease;
+      padding: 5px;
+    }
+    .post-options-btn:hover {
+      opacity: 1;
+      transform: rotate(90deg);
+    }
+    .post-options-menu {
+      position: absolute;
+      right: 0;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 5px 0;
+      min-width: 120px;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .post-options-menu.show {
+      display: block;
+    }
+    .post-options-item {
+      color: #f5f5f5;
+      padding: 5px 15px;
+      text-align: left;
+      width: 100%;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .post-options-item:hover {
+      background: rgba(255,92,138,0.2);
+    }
+    .post-options-item.delete {
+      color: #ff5c8a;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{% url 'dashboard' %}">PulseConnect</a>
+    <div class="d-flex">
+      <a href="{% url 'inbox' %}" class="nav-link me-3"><i class="bi bi-chat-dots"></i></a>
+      <a href="{% url 'profile_view' request.user.id %}" class="nav-link me-3"><i class="bi bi-person-circle"></i></a>
+      <a href="{% url 'search_page' %}" class="nav-link me-3"><i class="bi bi-search"></i></a>
+      <a href="{% url 'logout' %}" class="nav-link"><i class="bi bi-box-arrow-right"></i></a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  {% for post in posts %}
+    <div class="card" data-post-id="{{ post.id }}">
+      <div class="card-body">
+        <div class="post-header">
+          <div class="d-flex align-items-center">
+            {% if post.author.profile_pic %}
+              <img src="{{ post.author.profile_pic.url }}" class="rounded-circle me-2" width="40" height="40">
+            {% else %}
+              <img src="{% static 'images/default_user.png' %}" class="rounded-circle me-2" width="40" height="40">
+            {% endif %}
+            <h6 class="mb-0 text-light">@{{ post.author.username }}</h6>
+          </div>
+          {% if post.author == request.user %}
+            <div class="post-options">
+              <button class="post-options-btn">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <div class="post-options-menu">
+                <button class="post-options-item delete" data-post-id="{{ post.id }}">
+                  <i class="bi bi-trash me-2"></i>Delete
+                </button>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        
+        {% if post.image %}
+          <img src="{{ post.image.url }}" class="w-100 mb-3 post-img">
+        {% endif %}
+        <p class="text-light">{{ post.caption }}</p>
+
+        <div class="d-flex mb-2">
+          <div class="like-btn-container">
+            <button class="like-btn" data-post-id="{{ post.id }}">
+              <i class="bi bi-heart-fill {% if request.user in post.likes.all %}text-danger{% endif %}"></i>
+            </button>
+            <span class="like-count">{{ post.likes.count }}</span>
+          </div>
+          <button class="btn btn-sm comment-toggle me-3" data-post-id="{{ post.id }}">
+            <i class="bi bi-chat"></i> {{ post.comments.count }}
+          </button>
+          <button class="btn btn-sm save-btn" data-post-id="{{ post.id }}">
+            <i class="bi bi-bookmark{% if request.user in post.saves.all %}-fill{% endif %}"></i>
+          </button>
+        </div>
+
+        <div class="comments-section" id="comments-{{ post.id }}">
+          {% for comment in post.comments.all %}
+            <div class="comment-item" data-comment-id="{{ comment.id }}">
+              <div class="comment-text">
+                <span class="comment-username">@{{ comment.user.username }}:</span>
+                {{ comment.text }}
+              </div>
+              {% if comment.user == request.user %}
+                <div class="comment-actions">
+                  <button class="delete-comment" data-comment-id="{{ comment.id }}">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <form class="comment-form mt-2" data-post-id="{{ post.id }}">
+            {% csrf_token %}
+            <div class="input-group">
+              <input type="text" class="form-control comment-input" placeholder="Add a comment..." required name="comment_text">
+              <button class="btn btn-outline-primary" type="submit">Post</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-center mt-5">No posts yet.</p>
+  {% endfor %}
+</div>
+
+<!-- Post Delete Confirmation Modal -->
+<div class="confirmation-modal" id="postDeleteModal">
+  <div class="confirmation-box">
+    <h5 class="text-light mb-3">Delete Post</h5>
+    <p class="text-light mb-4">Are you sure you want to delete this post? This action cannot be undone.</p>
+    <div class="d-flex justify-content-end gap-3">
+      <button class="btn btn-outline-secondary" id="cancelPostDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmPostDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Comment Delete Confirmation Modal -->
+<div class="confirmation-modal" id="confirmationModal">
+  <div class="confirmation-box">
+    <h5 class="text-light mb-3">Delete Comment</h5>
+    <p class="text-light mb-4">Are you sure you want to delete this comment? This action cannot be undone.</p>
+    <div class="d-flex justify-content-end gap-3">
+      <button class="btn btn-outline-secondary" id="cancelDelete">Cancel</button>
+      <button class="btn btn-danger" id="confirmDelete">Delete</button>
+    </div>
+  </div>
+</div>
+
+<a href="{% url 'create_post' %}" class="fab"><i class="bi bi-plus-lg"></i></a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Like post functionality with animation
+    document.querySelectorAll('.like-btn').forEach(button => {
+      button.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const postId = this.getAttribute('data-post-id');
+        const heartIcon = this.querySelector('.bi-heart-fill');
+        const likeCount = this.closest('.like-btn-container').querySelector('.like-count');
+        const isCurrentlyLiked = heartIcon.classList.contains('text-danger');
+        
+        if (!isCurrentlyLiked) {
+          const animation = document.createElement('div');
+          animation.className = 'like-animation';
+          animation.innerHTML = '<i class="bi bi-heart-fill"></i>';
+          document.body.appendChild(animation);
+          setTimeout(() => { animation.remove(); }, 800);
+        }
+        
+        try {
+          const response = await fetch(`/like_post/${postId}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            }
+          });
+          const data = await response.json();
+          
+          if (data.liked) {
+            heartIcon.classList.add('text-danger');
+            heartIcon.style.transform = 'scale(1.3)';
+            setTimeout(() => { heartIcon.style.transform = 'scale(1)'; }, 200);
+          } else {
+            heartIcon.classList.remove('text-danger');
+          }
+          likeCount.textContent = data.likes_count;
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    });
+
+    // Comment toggle functionality
+    document.querySelectorAll('.comment-toggle').forEach(button => {
+      button.addEventListener('click', () => {
+        const postId = button.getAttribute('data-post-id');
+        const section = document.getElementById(`comments-${postId}`);
+        section.style.display = section.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+
+    // Add comment functionality
+    document.querySelectorAll('.comment-form').forEach(form => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const postId = form.getAttribute('data-post-id');
+        const input = form.querySelector('.comment-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        try {
+          const response = await fetch(`/add_comment/${postId}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `text=${encodeURIComponent(text)}`
+          });
+          const data = await response.json();
+          
+          if (data.success) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            const newComment = document.createElement('div');
+            newComment.className = 'comment-item';
+            newComment.dataset.commentId = data.comment_id;
+            newComment.innerHTML = `
+              <div class="comment-text">
+                <span class="comment-username">@${data.username}:</span>
+                ${text}
+              </div>
+              <div class="comment-actions">
+                <button class="delete-comment" data-comment-id="${data.comment_id}">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            `;
+            
+            const firstComment = commentsSection.querySelector('.comment-item');
+            if (firstComment) {
+              commentsSection.insertBefore(newComment, firstComment);
+            } else {
+              commentsSection.insertBefore(newComment, form);
+            }
+            
+            newComment.querySelector('.delete-comment').addEventListener('click', handleDeleteClick);
+            const commentToggle = document.querySelector(`.comment-toggle[data-post-id="${postId}"]`);
+            const currentCount = parseInt(commentToggle.innerHTML.match(/\d+/)[0]) || 0;
+            commentToggle.innerHTML = `<i class="bi bi-chat"></i> ${currentCount + 1}`;
+            input.value = '';
+          }
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    });
+
+    // Comment delete functionality
+    let currentCommentToDelete = null;
+    const confirmationModal = document.getElementById('confirmationModal');
+    const cancelDeleteBtn = document.getElementById('cancelDelete');
+    const confirmDeleteBtn = document.getElementById('confirmDelete');
+
+    function handleDeleteClick(e) {
+      currentCommentToDelete = e.currentTarget.dataset.commentId;
+      confirmationModal.classList.add('active');
+    }
+
+    document.querySelectorAll('.delete-comment').forEach(button => {
+      button.addEventListener('click', handleDeleteClick);
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+      confirmationModal.classList.remove('active');
+      currentCommentToDelete = null;
+    });
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+      if (!currentCommentToDelete) return;
+      
+      try {
+        const response = await fetch(`/delete_comment/${currentCommentToDelete}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          const commentElement = document.querySelector(`.comment-item[data-comment-id="${currentCommentToDelete}"]`);
+          if (commentElement) {
+            commentElement.remove();
+            const postId = commentElement.closest('.comments-section').id.split('-')[1];
+            const commentToggle = document.querySelector(`.comment-toggle[data-post-id="${postId}"]`);
+            const currentCount = parseInt(commentToggle.innerHTML.match(/\d+/)[0]) || 0;
+            commentToggle.innerHTML = `<i class="bi bi-chat"></i> ${Math.max(0, currentCount - 1)}`;
+          }
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      } finally {
+        confirmationModal.classList.remove('active');
+        currentCommentToDelete = null;
+      }
+    });
+
+    // Save post functionality
+    document.querySelectorAll('.save-btn').forEach(button => {
+      button.addEventListener('click', async () => {
+        const postId = button.getAttribute('data-post-id');
+        try {
+          const response = await fetch(`/save_post/${postId}/`, {
+            method: 'POST',
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            }
+          });
+          const data = await response.json();
+          button.innerHTML = data.saved ? '<i class="bi bi-bookmark-fill"></i>' : '<i class="bi bi-bookmark"></i>';
+        } catch (error) {
+          console.error('Error:', error);
+        }
+      });
+    });
+
+    // Post options dropdown functionality
+    document.querySelectorAll('.post-options-btn').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const menu = this.nextElementSibling;
+        document.querySelectorAll('.post-options-menu').forEach(m => {
+          if (m !== menu) m.classList.remove('show');
+        });
+        menu.classList.toggle('show');
+      });
+    });
+    
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.post-options-menu').forEach(menu => {
+        menu.classList.remove('show');
+      });
+    });
+
+   
+    // Enhanced Post delete functionality
+    let currentPostToDelete = null;
+    const postDeleteModal = document.getElementById('postDeleteModal');
+    const cancelPostDeleteBtn = document.getElementById('cancelPostDelete');
+    const confirmPostDeleteBtn = document.getElementById('confirmPostDelete');
+    
+    document.querySelectorAll('.post-options-item.delete').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
+        currentPostToDelete = this.getAttribute('data-post-id');
+        postDeleteModal.classList.add('active');
+      });
+    });
+    
+    cancelPostDeleteBtn.addEventListener('click', () => {
+      postDeleteModal.classList.remove('active');
+      currentPostToDelete = null;
+    });
+    
+    confirmPostDeleteBtn.addEventListener('click', async () => {
+      if (!currentPostToDelete) return;
+      
+      // Show loading state
+      confirmPostDeleteBtn.disabled = true;
+      confirmPostDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+      
+      try {
+        const response = await fetch(`/delete_post/${currentPostToDelete}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          const postElement = document.querySelector(`.card[data-post-id="${currentPostToDelete}"]`);
+          if (postElement) {
+            // Add visual feedback before removal
+            postElement.style.transform = 'scale(0.95)';
+            postElement.style.boxShadow = '0 0 15px rgba(255, 92, 138, 0.5)';
+            postElement.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+              postElement.style.opacity = '0';
+              postElement.style.transform = 'scale(0.8)';
+              
+              setTimeout(() => {
+                postElement.remove();
+                
+                // Check if we need to show the "No posts" message
+                if (document.querySelectorAll('.card').length === 0) {
+                  const container = document.querySelector('.container');
+                  // Remove any existing "No posts" message first
+                  const existingMessage = document.querySelector('.no-posts-message');
+                  if (existingMessage) existingMessage.remove();
+                  
+                  const noPostsMessage = document.createElement('p');
+                  noPostsMessage.className = 'text-center mt-5 no-posts-message';
+                  noPostsMessage.textContent = 'No posts yet.';
+                  container.appendChild(noPostsMessage);
+                }
+                
+                // Show success notification
+                showNotification('Post deleted successfully!');
+              }, 300);
+            }, 100);
+          }
+        } else {
+          showNotification('Failed to delete post. Please try again.', true);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        showNotification('An error occurred. Please try again.', true);
+      } finally {
+        // Reset modal state
+        confirmPostDeleteBtn.disabled = false;
+        confirmPostDeleteBtn.textContent = 'Delete';
+        postDeleteModal.classList.remove('active');
+        currentPostToDelete = null;
+      }
+    });
+
+    // Notification function
+    function showNotification(message, isError = false) {
+      const notification = document.createElement('div');
+      notification.className = `position-fixed top-0 start-50 translate-middle-x mt-3 alert alert-${
+        isError ? 'danger' : 'success'
+      }`;
+      notification.style.zIndex = '2100';
+      notification.style.transition = 'all 0.3s ease';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Auto-remove after 3 seconds
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+      }, 3000);
+    }
+  });
+</script>
+</body>
+</html>

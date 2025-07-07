@@ -1,0 +1,469 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inbox - PulseConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        body {
+  margin: 0;
+  background: #0b0c10;
+  color: #f5f5f5;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: url("{% static 'images/pulse-pink.svg' %}") repeat-x;
+  background-size: contain;
+  animation: movePulse 10s linear infinite;
+  z-index: -1;
+  opacity: 0.3;
+  transform: scale(1.05);
+}
+
+@keyframes movePulse {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.navbar {
+  background: rgba(0, 0, 0, 0.9);
+  border-bottom: 1px solid #ff5c8a;
+}
+
+.navbar-brand {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ff5c8a;
+  text-shadow: 0 0 10px #ff5c8a;
+}
+
+/* Leave your existing inbox-container, chat-card, buttons and animations CSS as it is — all your great inbox card styles remain untouched */
+
+        .inbox-container {
+            max-width: 720px;
+            margin: 40px auto;
+            padding: 25px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 1.2rem;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .inbox-heading {
+            font-size: 2rem;
+            color: #ff5c8a;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .chat-list {
+            max-height: 520px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ff5c8a #1e1e1e;
+        }
+
+        .chat-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-list::-webkit-scrollbar-track {
+            background: #1e1e1e;
+            border-radius: 10px;
+        }
+
+        .chat-list::-webkit-scrollbar-thumb {
+            background-color: #ff5c8a;
+            border-radius: 10px;
+        }
+
+        .chat-card {
+            padding: 15px;
+            background: #1e1e1e;
+            border-radius: 0.8rem;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.6s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-card:hover {
+            background: linear-gradient(135deg, #ff4e50, #f9d423);
+            color: #fff;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(255, 92, 138, 0.4);
+        }
+
+        .chat-card.unread {
+            border-left: 4px solid #ff5c8a;
+        }
+
+        .chat-card.priority {
+            background: linear-gradient(135deg, #1e1e1e, #3a1c71);
+        }
+
+        .chat-card.priority:hover {
+            background: linear-gradient(135deg, #3a1c71, #d76d77);
+        }
+
+        .message-btn {
+            background: #ff5c8a;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .message-btn:hover {
+            background: #ff326e;
+            transform: translateY(-2px);
+        }
+
+        .last-message {
+            font-size: 0.9rem;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .time-stamp {
+            font-size: 0.75rem;
+            color: #aaa;
+        }
+
+        .online-dot {
+            width: 10px;
+            height: 10px;
+            background: #00ff88;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        .typing-indicator {
+            font-size: 0.8rem;
+            color: #ff5c8a;
+            font-style: italic;
+        }
+
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ff5c8a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            color: white;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .fab:hover {
+            background: #ff326e;
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .message-preview {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .preview-icon {
+            font-size: 0.8rem;
+        }
+
+        .streak-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 92, 138, 0.2);
+            color: #ff5c8a;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .reaction-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            display: flex;
+            gap: 3px;
+        }
+
+        .reaction {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .inbox-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .inbox-tab {
+            padding: 8px 15px;
+            background: rgba(255, 92, 138, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .inbox-tab.active {
+            background: #ff5c8a;
+            font-weight: bold;
+        }
+
+        .inbox-tab:hover {
+            background: rgba(255, 92, 138, 0.4);
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(30, 30, 30, 0.8);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            padding-left: 40px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        @keyframes slideInUp {
+            0% {opacity: 0; transform: translateY(20px);}
+            100% {opacity: 1; transform: translateY(0);}
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .avatar-ring {
+            position: relative;
+            width: 50px;
+            height: 50px;
+        }
+
+        .avatar-ring::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border: 2px solid transparent;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff5c8a, #f9d423) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            animation: rotateRing 4s linear infinite;
+        }
+
+        @keyframes rotateRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">PulseConnect</a>
+        <div class="d-flex">
+            <a href="{% url 'dashboard' %}" class="nav-link me-3" title="Home">
+                <i class="bi bi-house-door-fill"></i>
+            </a>
+        </div>
+    </div>
+</nav>
+
+
+
+<div class="inbox-container">
+    <h3 class="inbox-heading animate__animated animate__fadeIn">Inbox</h3>
+
+    <div class="search-container">
+        <i class="bi bi-search search-icon"></i>
+        <input type="text" class="search-input" placeholder="Search messages, people..." id="searchInput">
+    </div>
+
+    <div class="inbox-tabs">
+        <div class="inbox-tab active" data-tab="all">All</div>
+        <div class="inbox-tab" data-tab="unread">Unread</div>
+        <div class="inbox-tab" data-tab="priority">Priority</div>
+        <div class="inbox-tab" data-tab="groups">Groups</div>
+    </div>
+
+    <div class="chat-list">
+        {% for msg in messages_data %}
+        <div class="chat-card {% if forloop.counter0 < 2 %}priority{% endif %} {% if forloop.counter0 == 3 %}unread{% endif %} animate__animated animate__fadeInUp" style="animation-delay: {{ forloop.counter0|add:1|divisibleby:2|yesno:'0.2s,0.1s' }}">
+            <div class="d-flex align-items-center">
+                <div class="avatar-ring me-3">
+                    <img src="{% if msg.user.profile and msg.user.profile.profile_pic %}{{ msg.user.profile.profile_pic.url }}{% else %}{% static 'images/default_user.png' %}{% endif %}" class="rounded-circle" width="50" height="50">
+                </div>
+
+                <div style="flex-grow: 1;">
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0 me-2">@{{ msg.user.username }}</h6>
+                        {% if forloop.counter0 < 3 %}<span class="online-dot"></span>{% endif %}
+                        {% if forloop.counter0 == 2 %}<span class="typing-indicator">typing...</span>{% endif %}
+                    </div>
+                    
+                    <div class="message-preview">
+                        {% if forloop.counter0|divisibleby:2 %}
+                            <i class="bi bi-image-fill preview-icon"></i>
+                            <span class="last-message">Photo</span>
+                        {% elif forloop.counter0|add:1|divisibleby:3 %}
+                            <i class="bi bi-geo-alt-fill preview-icon"></i>
+                            <span class="last-message">Location shared</span>
+                        {% else %}
+                            <span class="last-message">{{ msg.latest_msg|truncatechars:30 }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-end">
+                <div class="time-stamp mb-1">
+                    {% if forloop.first %}
+                        Just now
+                    {% elif forloop.counter0 == 1 %}
+                        Today
+                    {% else %}
+                        {{ msg.time }}
+                    {% endif %}
+                </div>
+                <a href="{% url 'chat' msg.user.id %}" class="btn btn-sm message-btn">
+                    <i class="bi bi-chat-dots-fill"></i> Message
+                </a>
+            </div>
+
+            {% if forloop.counter0|divisibleby:3 %}
+                <div class="streak-badge">
+                    <i class="bi bi-fire"></i> {{ forloop.counter|add:2 }}-day streak
+                </div>
+            {% endif %}
+
+            {% if forloop.counter0|add:1|divisibleby:4 %}
+                <div class="reaction-badge">
+                    <div class="reaction">👍</div>
+                    <div class="reaction">❤️</div>
+                </div>
+            {% endif %}
+        </div>
+        {% empty %}
+            <div class="text-center mt-5 animate__animated animate__fadeIn">
+                <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.5;"></i>
+                <p class="mt-3">Your inbox is empty. Start a conversation!</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<a href="{% url 'create_post' %}" class="fab animate__animated animate__bounceIn" style="animation-delay: 0.5s">
+    <i class="bi bi-plus-lg"></i>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.inbox-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.inbox-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // In a real app, you would filter chats here
+            console.log(`Switched to ${this.dataset.tab} tab`);
+        });
+    });
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        // In a real app, you would filter chats based on search term
+        console.log(`Searching for: ${searchTerm}`);
+    });
+
+    // Add swipe functionality to chat cards
+    document.querySelectorAll('.chat-card').forEach(card => {
+        const hammertime = new Hammer(card);
+        
+        hammertime.on('swipeleft', function() {
+            card.style.transform = 'translateX(-100px)';
+            setTimeout(() => {
+                card.style.display = 'none';
+                // In real app, this would archive the chat
+                console.log('Archived chat');
+            }, 300);
+        });
+        
+        hammertime.on('swiperight', function() {
+            card.style.transform = 'translateX(100px)';
+            setTimeout(() => {
+                card.style.display = 'none';
+                // In real app, this would mute the chat
+                console.log('Muted chat');
+            }, 300);
+        });
+    });
+
+    // Simulate real-time updates
+    setInterval(() => {
+        const typingIndicators = document.querySelectorAll('.typing-indicator');
+        typingIndicators.forEach(indicator => {
+            indicator.style.display = indicator.style.display === 'none' ? 'inline-block' : 'none';
+        });
+    }, 1000);
+</script>
+
+</body>
+</html>

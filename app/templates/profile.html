@@ -1,0 +1,406 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ profile.user.username }}'s Profile - PulseConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            color: #ff5c8a !important;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px;
+        }
+        .profile-header img {
+            border-radius: 50%;
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 3px solid #ff5c8a;
+        }
+        .username {
+            font-size: 1.7rem;
+            font-weight: bold;
+        }
+        .post-card {
+            background-color: #1e1e1e;
+            border: none;
+            margin-bottom: 20px;
+            border-radius: 1rem;
+        }
+        .post-img {
+            border-radius: 1rem 1rem 0 0;
+            object-fit: cover;
+            height: 400px;
+        }
+        .post-body {
+            padding: 15px;
+        }
+        .caption {
+            color: #f5f5f5;
+        }
+        .btn-custom {
+            background-color: #ff5c8a;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #ff326e;
+        }
+        .heart-popup {
+            position: absolute;
+            color: #ff5c8a;
+            font-size: 4rem;
+            opacity: 0;
+            transform: scale(0.5);
+            animation: popFade 0.6s ease forwards;
+            pointer-events: none;
+            z-index: 10;
+        }
+        @keyframes popFade {
+            0% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2);
+            }
+        }
+        /* Instagram-style Follow Button */
+        .follow-btn {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 5px 9px;
+            min-width: 90px;
+            height: 32px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        .follow-btn:hover {
+            background-color: #1877f2;
+        }
+        .following-container {
+            position: relative;
+            display: inline-block;
+        }
+        .following-btn {
+            background-color: #262626;
+            color: #f5f5f5;
+            border: 1px solid #363636;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 5px 9px;
+            min-width: 90px;
+            height: 32px;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        .following-btn:hover {
+            background-color: #363636;
+            border-color: #a8a8a8;
+        }
+        .following-dropdown {
+            display: none;
+            position: absolute;
+            background-color: #262626;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 8px;
+            padding: 8px 0;
+            right: 0;
+            top: 100%;
+        }
+        .following-dropdown a {
+            color: #f5f5f5;
+            padding: 8px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+        .following-dropdown a:hover {
+            background-color: #363636;
+        }
+        .following-dropdown .divider {
+            border-top: 1px solid #363636;
+            margin: 8px 0;
+        }
+        .following-container:hover .following-dropdown {
+            display: block;
+        }
+        .unfollow-option {
+            color: #ed4956 !important;
+            font-weight: 600;
+        }
+        .pending-btn {
+            background-color: #262626;
+            color: #8e8e8e;
+            border: 1px solid #363636;
+            border-radius: 8px;
+            font-weight: 600;
+            padding: 5px 9px;
+            min-width: 90px;
+            height: 32px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">PulseConnect</a>
+        <div class="d-flex">
+            <a href="{% url 'dashboard' %}" class="nav-link me-3"><i class="bi bi-house-door"></i></a>
+            <a href="{% url 'create_post' %}" class="nav-link me-3"><i class="bi bi-plus-square"></i></a>
+            <a href="{% url 'inbox' %}" class="nav-link me-3"><i class="bi bi-chat-dots"></i></a>
+            <div class="dropdown me-3">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="profileDropdown">
+                    <li><a class="dropdown-item" href="{% url 'profile_view' request.user.id %}"><i class="bi bi-person"></i> Profile</a></li>
+                    <li><a class="dropdown-item" href="{% url 'edit_profile' %}"><i class="bi bi-pencil-square"></i> Edit Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="profile-header">
+        {% if profile.profile_pic %}
+            <img src="{{ profile.profile_pic.url }}" alt="Profile Picture">
+        {% else %}
+            <img src="{% static 'images/default_user.png' %}" alt="Default Profile">
+        {% endif %}
+        <div>
+            <div class="username">@{{ profile.user.username }}</div>
+
+            <div class="d-flex mt-2 mb-2">
+                <div class="me-3">
+                    <strong id="follower-count">{{ followers_count }}</strong> Followers
+                </div>
+                <div>
+                    <strong>{{ following_count }}</strong> Following
+                </div>
+            </div>
+
+            <div class="d-flex gap-2" id="profileActions">
+                {% if request.user.id == profile.user.id %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-sm btn-outline-light">
+                    <i class="bi bi-pencil-square"></i> Edit Profile
+                </a>
+                {% else %}
+                <a href="{% url 'chat' profile.user.id %}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-chat-dots"></i> Message
+                </a>
+                
+                <!-- Follow Button Section -->
+                {% if is_following %}
+                    <div class="following-container">
+                        <button class="btn btn-sm following-btn" data-user-id="{{ profile.user.id }}" id="followButton">
+                            Following
+                        </button>
+                        <div class="following-dropdown">
+                            <a href="#">Add to Close Friends</a>
+                            <a href="#">Add to favorites</a>
+                            <a href="#">Mute</a>
+                            <a href="#">Restrict</a>
+                            <div class="divider"></div>
+                            <a href="#" class="unfollow-option" id="unfollowOption">Unfollow</a>
+                        </div>
+                    </div>
+                {% elif has_pending %}
+                    <button class="btn btn-sm pending-btn" disabled id="followButton">
+                        Request Sent
+                    </button>
+                {% else %}
+                    <button class="btn btn-sm follow-btn" data-user-id="{{ profile.user.id }}" id="followButton">
+                        Follow
+                    </button>
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-3">
+    <h4 class="text-light mb-3">Posts</h4>
+
+    {% if posts %}
+    <div class="row row-cols-2 row-cols-md-3 g-3">
+        {% for post in posts %}
+        <div class="col">
+            <div class="card bg-dark border-0">
+                {% if post.image %}
+                <a href="{% url 'post_detail' post.id %}">
+                    <img src="{{ post.image.url }}" class="w-100 rounded" style="height: 250px; object-fit: cover;">
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-light">No posts yet.</p>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profileActions = document.querySelector('.profile-header .d-flex.gap-2');
+    const userId = "{{ profile.user.id }}";
+    const followerCountElem = document.getElementById('follower-count');
+
+    // Set follower count text
+    function setFollowerCount(count) {
+        if (followerCountElem) {
+            followerCountElem.textContent = count;
+        }
+    }
+
+    // Bootstrap dropdown initializer
+    function initializeDropdowns() {
+        const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+        dropdownElements.forEach(el => {
+            new bootstrap.Dropdown(el);
+        });
+    }
+
+    // Follow handler
+    async function handleFollow() {
+        try {
+            profileActions.innerHTML = `
+                <a href="{% url 'chat' profile.user.id %}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-chat-dots"></i> Message
+                </a>
+                <div class="dropdown me-2">
+                    <button class="btn btn-sm following-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Following
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="#">Add to Close Friends</a></li>
+                        <li><a class="dropdown-item" href="#">Add to favorites</a></li>
+                        <li><a class="dropdown-item" href="#">Mute</a></li>
+                        <li><a class="dropdown-item" href="#">Restrict</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a href="#" class="dropdown-item text-danger" id="unfollowOption">Unfollow</a></li>
+                    </ul>
+                </div>
+            `;
+
+            initializeDropdowns();
+
+            const response = await fetch(`/follow/${userId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                setFollowerCount(data.follower_count);
+            }
+
+            if (data.status === 'requested') {
+                profileActions.innerHTML = `
+                    <a href="{% url 'chat' profile.user.id %}" class="btn btn-sm btn-outline-info">
+                        <i class="bi bi-chat-dots"></i> Message
+                    </a>
+                    <button class="btn btn-sm pending-btn" disabled>
+                        Request Sent
+                    </button>
+                `;
+            }
+
+            document.getElementById('unfollowOption')?.addEventListener('click', function(e) {
+                e.preventDefault();
+                handleUnfollow();
+            });
+
+        } catch (error) {
+            console.error('Follow error:', error);
+        }
+    }
+
+    // Unfollow handler
+    async function handleUnfollow() {
+        try {
+            profileActions.innerHTML = `
+                <a href="{% url 'chat' profile.user.id %}" class="btn btn-sm btn-outline-info">
+                    <i class="bi bi-chat-dots"></i> Message
+                </a>
+                <button class="btn btn-sm follow-btn" id="followButton">
+                    Follow
+                </button>
+            `;
+
+            const response = await fetch(`/unfollow/${userId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                setFollowerCount(data.follower_count);
+            }
+
+            document.getElementById('followButton')?.addEventListener('click', handleFollow);
+        } catch (error) {
+            console.error('Unfollow error:', error);
+        }
+    }
+
+    // Setup initial button events
+    {% if is_following %}
+        document.getElementById('unfollowOption')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleUnfollow();
+        });
+    {% else %}
+        document.getElementById('followButton')?.addEventListener('click', handleFollow);
+    {% endif %}
+
+    // Periodic follower count sync
+    function fetchFollowerCount() {
+        fetch(`/followers-count/${userId}/`)
+            .then(response => response.json())
+            .then(data => {
+                setFollowerCount(data.follower_count);
+            })
+            .catch(error => console.error('Error fetching count:', error));
+    }
+
+    fetchFollowerCount();
+    setInterval(fetchFollowerCount, 5000);
+});
+
+</script>
+
+</body>
+</html>

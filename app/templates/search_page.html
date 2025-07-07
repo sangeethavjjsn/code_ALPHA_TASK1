@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Users | PulseConnect</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+      body {
+        background: linear-gradient(-45deg, #ff4e50, #f9d423, #24c6dc, #5433ff);
+        background-size: 600% 600%;
+        animation: rainbowGradient 10s ease infinite;
+        color: #f5f5f5;
+        overflow-x: hidden;
+      }
+
+      @keyframes rainbowGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      .search-container {
+        max-width: 500px;
+        margin: 80px auto;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 40px 30px;
+        border-radius: 1rem;
+        text-align: center;
+        box-shadow: 0 0 30px rgba(0,0,0,0.3);
+        animation: fadeIn 1.2s ease;
+      }
+
+      @keyframes fadeIn {
+        0% { opacity: 0; transform: translateY(20px);}
+        100% { opacity: 1; transform: translateY(0);}
+      }
+
+      .search-container h2 {
+        font-size: 1.8rem;
+        margin-bottom: 25px;
+        color: #ffcb00;
+        text-shadow: 0 0 8px #fff;
+      }
+
+      .form-control {
+        background: rgba(255,255,255,0.15);
+        border: none;
+        color: #fff;
+        border-radius: 30px;
+        padding: 14px 20px;
+        font-size: 1rem;
+      }
+
+      .form-control::placeholder {
+        color: #ddd;
+      }
+
+      .form-control:focus {
+        background: rgba(255,255,255,0.25);
+        color: #fff;
+        border: none;
+        box-shadow: 0 0 8px #ff5c8a;
+      }
+
+      .btn-primary {
+        background-color: #ff5c8a;
+        border: none;
+        border-radius: 30px;
+        padding: 10px 30px;
+        font-size: 1rem;
+        margin-top: 15px;
+      }
+
+      .btn-primary:hover {
+        background-color: #ff326e;
+      }
+
+      .nav-link {
+        color: #fff;
+        font-size: 1.6rem;
+      }
+
+      .nav-link:hover {
+        color: #ffcb00;
+      }
+    </style>
+</head>
+<body>
+
+<!-- Top Navbar -->
+<nav class="navbar navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a href="{% url 'dashboard' %}" class="nav-link"><i class="bi bi-house-door-fill"></i></a>
+    <span class="navbar-text ms-auto" style="color: #ff5c8a; font-weight: bold;">PulseConnect</span>
+  </div>
+</nav>
+
+<!-- Search Form -->
+<div class="search-container">
+  <h2>Search for Users</h2>
+  <form method="GET" action="{% url 'search_users' %}">
+    <input type="text" name="q" class="form-control mb-3" placeholder="Type a username..." required>
+    <button type="submit" class="btn btn-primary">Search</button>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

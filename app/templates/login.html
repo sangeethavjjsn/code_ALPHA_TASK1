@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login – PulseConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* full‑screen black + pulse animation */
+    body, html {
+      width: 100%; height: 100%;
+      margin: 0; padding: 0;
+      background: #000;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    .pulse-background {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .pulse-line {
+      position: absolute;
+      top: 50%;
+      width: 200%; height: 2px;
+    }
+    .pulse-line::before {
+      content: "";
+      display: block;
+      width: 400%; height: 2px;
+      background: linear-gradient(
+        to right,
+        transparent 0%,
+        #ff5c8a 10%,
+        transparent 20%,
+        #ff5c8a 22%,
+        transparent 30%,
+        #ff5c8a 35%,
+        transparent 100%
+      );
+      animation: pulseMove 3s linear infinite;
+    }
+    @keyframes pulseMove {
+      0%   { transform: translateX(-50%); }
+      100% { transform: translateX(-150%); }
+    }
+
+    /* center‑screen login box */
+    .login-box {
+      position: relative;       /* so any absolute children stay inside */
+      z-index: 10;
+      max-width: 400px;
+      width: 90%;
+      background: rgba(0,0,0,0.85);
+      padding: 40px 30px;
+      border-radius: 1rem;
+      box-shadow: 0 0 30px rgba(255,92,138,0.5);
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+    }
+    .login-box h3 {
+      margin-bottom: 1.5rem;
+      color: #ff5c8a;
+      font-weight: 700;
+      text-align: center;
+    }
+    .form-label {
+      color: #ddd;
+      font-weight: 500;
+    }
+    .form-control {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid transparent;
+      color: #fff;
+    }
+    .form-control:focus {
+      background: rgb(255, 255, 255);
+      border-color: #ff5c8a;
+      box-shadow: 0 0 0 .15rem rgba(255,92,138,0.3);
+    }
+    .btn-login {
+      background: #ff5c8a;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 50px;
+      margin-top: 1rem;
+    }
+    .btn-login:hover {
+      background: #ff326e;
+    }
+    .toggle-password {
+      cursor: pointer;
+      color: #bbb;
+    }
+    .toggle-password:hover {
+      color: #fff;
+    }
+
+
+
+
+
+
+
+
+
+    
+    .text-center a {
+      color: #ff5c8a;
+    }
+    .text-center a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- pulse background -->
+  <div class="pulse-background">
+    <div class="pulse-line"></div>
+  </div>
+
+  <!-- login form -->
+  <div class="login-box">
+    <h3>Welcome Back</h3>
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" class="form-control" required autofocus>
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label class="form-label">Password</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+        <span class="position-absolute toggle-password" style="top: 38px; right: 15px;" onclick="togglePassword()">
+          <i class="bi bi-eye" id="pwIcon"></i>
+        </span>
+      </div>
+
+      <button type="submit" class="btn btn-login">Log In</button>
+    </form>
+
+    <p class="text-center mt-3">Don't have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function togglePassword() {
+      const pw = document.getElementById('password');
+      const icon = document.getElementById('pwIcon');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.classList.replace('bi-eye', 'bi-eye-slash');
+      } else {
+        pw.type = 'password';
+        icon.classList.replace('bi-eye-slash', 'bi-eye');
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+
+

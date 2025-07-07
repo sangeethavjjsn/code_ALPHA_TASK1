@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PulseConnect</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+  
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Pulse background effect */
+    .pulse-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .pulse-line {
+      position: absolute;
+      top: 50%;
+      width: 200%;
+      height: 2px;
+    }
+    .pulse-line::before {
+      content: "";
+      display: block;
+      width: 400%;
+      height: 2px;
+      background: linear-gradient(
+        to right,
+        transparent 0%, #ff5c8a 10%,
+        transparent 20%, #ff5c8a 22%,
+        transparent 30%, #ff5c8a 35%,
+        transparent 100%
+      );
+      animation: pulseMove 3s linear infinite;
+    }
+    @keyframes pulseMove {
+      0% { transform: translateX(-50%); }
+      100% { transform: translateX(-150%); }
+    }
+
+    /* Create Account Button */
+    .btn-create {
+      z-index: 10;
+      background: #ff5c8a;
+      border: none;
+      padding: 15px 35px;
+      font-size: 1.3rem;
+      border-radius: 50px;
+      transition: .3s;
+      position: relative;
+    }
+    .btn-create:hover {
+      background: #ff326e;
+    }
+
+    /* Registration Box */
+    .signup-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      background: rgba(0,0,0,0.9);
+      padding: 30px 25px;
+      border-radius: 1rem;
+      box-shadow: 0 0 30px rgba(255,92,138,0.5);
+      z-index: 20;
+      display: none;
+      border: 1px solid #ff5c8a;
+      overflow-y: auto;
+    }
+
+    /* Home Icon */
+    .home-link {
+      position: absolute;
+      top: 2px;
+      left: 20px;
+      color: #ff5c8a;
+      font-size: 1.4rem;
+      z-index: 30;
+    }
+    .home-link:hover {
+      color: #ff326e;
+    }
+
+    /* Form Styles */
+    .signup-box label {
+      color: #eee;
+      font-weight: 500;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .signup-box .form-control {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 10px 15px;
+    }
+    .signup-box .form-control:focus {
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 0 0 .15rem rgba(255,92,138,0.3);
+      border-color: #ff5c8a;
+    }
+    .signup-box .btn-submit {
+      background: #ff5c8a;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    .signup-box .btn-submit:hover {
+      background: #ff326e;
+    }
+    .signup-box .login-prompt {
+      text-align: center;
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    .signup-box .login-prompt a {
+      color: #ff5c8a;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .signup-box .login-prompt a:hover {
+      color: #ff326e;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+      position: relative;
+    }
+    .password-toggle .toggle-icon {
+      position: absolute;
+      right: 12px;
+      top: 42px;
+      cursor: pointer;
+      color: #aaa;
+      z-index: 5;
+      font-size: 1.1rem;
+    }
+    .password-toggle .toggle-icon:hover {
+      color: #ff5c8a;
+    }
+
+    /* Profile Picture Upload */
+    .profile-pic-upload {
+      margin-bottom: 15px;
+    }
+    .profile-pic-container {
+      position: relative;
+    }
+    #cropperContainer {
+      display: none;
+      margin-bottom: 10px;
+      max-height: 200px; /* Reduced height */
+    }
+    .cropper-controls {
+      display: none;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn-crop-cancel {
+      background: rgba(255,255,255,0.1);
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      flex: 1;
+    }
+    .btn-crop-confirm {
+      background: #ff5c8a;
+      color: white;
+      border: none;
+      padding: 8px;
+      border-radius: 5px;
+      flex: 1;
+    }
+    .final-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 2px solid #ff5c8a;
+      object-fit: cover;
+      display: none;
+      margin: 10px auto;
+    }
+    .btn-upload {
+      width: 100%;
+      padding: 10px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-upload:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.3);
+    }
+    .btn-upload i {
+      margin-right: 8px;
+      color: #ff5c8a;
+    }
+    #profilePicInput {
+      display: none;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(#ff5c8a, #ff326e);
+      border-radius: 10px;
+      border: 2px solid rgba(0, 0, 0, 0.2);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(#ff326e, #ff0a5a);
+    }
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* For Firefox */
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: #ff5c8a rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body>
+  <!-- Pulse Background Effect -->
+  <div class="pulse-background">
+    <div class="pulse-line"></div>
+  </div>
+
+  <!-- Create Account Button (Centered) -->
+  <button class="btn btn-create" id="createAccountBtn">Create Account</button>
+
+  <!-- Registration Box (Hidden Initially) -->
+  <div id="signupModal" class="signup-box">
+    <!-- Home Icon -->
+    <!-- Home Icon -->
+<a href="{% url 'welcome' %}" class="home-link">
+  <i class="bi bi-house-fill"></i>
+</a>
+
+    
+    <!-- Close Button -->
+    <button class="btn-close" onclick="closeSignup()" style="
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      color: #ff5c8a;
+      background: none;
+      border: none;
+      font-size: 1.6rem;
+    ">&times;</button>
+    
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-3">
+        <label>Username</label>
+        <input type="text" name="username" class="form-control" required>
+      </div>
+      
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+      
+      <div class="mb-3 password-toggle">
+        <label>Password</label>
+        <input type="password" name="password1" id="password1" class="form-control" required>
+        <i class="bi bi-eye-fill toggle-icon" id="togglePassword1"></i>
+      </div>
+      
+      <div class="mb-3 password-toggle">
+        <label>Confirm Password</label>
+        <input type="password" name="password2" id="password2" class="form-control" required>
+        <i class="bi bi-eye-fill toggle-icon" id="togglePassword2"></i>
+      </div>
+      
+      <div class="mb-3">
+        <label>Bio</label>
+        <textarea name="bio" rows="2" class="form-control"></textarea>
+      </div>
+      
+      <!-- Profile Picture Upload with Inline Cropper -->
+      <div class="mb-3 profile-pic-upload">
+        <label>Profile Picture</label>
+        <div class="profile-pic-container">
+          <!-- Cropper Container -->
+          <div id="cropperContainer"></div>
+          
+          <!-- Upload Interface -->
+          <div class="upload-interface">
+            <label for="profilePicInput" class="btn-upload">
+              <i class="bi bi-cloud-arrow-up"></i> Choose Image
+            </label>
+            <input type="file" name="profile_pic" id="profilePicInput" accept="image/*">
+            
+            <!-- Cropper Controls -->
+            <div id="cropperControls" class="cropper-controls">
+              <button type="button" class="btn-crop-cancel">Cancel</button>
+              <button type="button" class="btn-crop-confirm">Confirm</button>
+            </div>
+            
+            <!-- Final Preview -->
+            <img id="finalPreview" class="final-preview" src="#" alt="Final Preview">
+          </div>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn btn-submit">Register</button>
+      
+      <p class="login-prompt">
+        Already have an account? <a href="{% url 'login' %}">Login</a>
+
+      </p>
+    </form>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script>
+    // Show registration box when Create Account is clicked
+    document.getElementById('createAccountBtn').addEventListener('click', function() {
+      document.getElementById('signupModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    });
+
+    // Close registration box
+    function closeSignup() {
+      document.getElementById('signupModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+      // Reset cropper if open
+      if (cropper) {
+        cropper.destroy();
+        cropperContainer.style.display = 'none';
+        cropperControls.style.display = 'none';
+        finalPreview.style.display = 'none';
+        document.getElementById('profilePicInput').value = '';
+      }
+    }
+
+    // Password toggle functionality
+    document.getElementById('togglePassword1').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password1');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('bi-eye-slash-fill');
+    });
+
+    document.getElementById('togglePassword2').addEventListener('click', function() {
+      const passwordInput = document.getElementById('password2');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.classList.toggle('bi-eye-slash-fill');
+    });
+
+    // Profile picture handling with cropper
+    let cropper;
+    const profilePicInput = document.getElementById('profilePicInput');
+    const cropperContainer = document.getElementById('cropperContainer');
+    const cropperControls = document.getElementById('cropperControls');
+    const finalPreview = document.getElementById('finalPreview');
+    const btnCropCancel = document.querySelector('.btn-crop-cancel');
+    const btnCropConfirm = document.querySelector('.btn-crop-confirm');
+
+    // Hide controls initially
+    cropperControls.style.display = 'none';
+
+    profilePicInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(event) {
+          // Clear previous cropper
+          cropperContainer.innerHTML = '';
+          
+          // Create image element for cropper
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          img.style.maxWidth = '100%';
+          img.style.maxHeight = '200px'; // Limit height
+          cropperContainer.appendChild(img);
+          
+          // Show cropper and controls
+          cropperContainer.style.display = 'block';
+          cropperControls.style.display = 'flex';
+          finalPreview.style.display = 'none';
+          
+          // Initialize cropper
+          if (cropper) cropper.destroy();
+          cropper = new Cropper(img, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 0.8,
+            responsive: true,
+            guides: false
+          });
+
+          // Scroll to show the cropper controls
+          cropperControls.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        };
+        
+        reader.readAsDataURL(e.target.files[0]);
+      }
+    });
+
+    btnCropCancel.addEventListener('click', function() {
+      // Reset everything
+      cropperContainer.style.display = 'none';
+      cropperControls.style.display = 'none';
+      finalPreview.style.display = 'none';
+      profilePicInput.value = '';
+      if (cropper) cropper.destroy();
+    });
+
+    btnCropConfirm.addEventListener('click', function() {
+      // Get cropped result
+      const canvas = cropper.getCroppedCanvas({
+        width: 300,
+        height: 300,
+        fillColor: '#000'
+      });
+      
+      if (canvas) {
+        // Convert to blob and create preview
+        canvas.toBlob(function(blob) {
+          // Create final preview
+          finalPreview.src = URL.createObjectURL(blob);
+          finalPreview.style.display = 'block';
+          
+          // Hide cropper and controls
+          cropperContainer.style.display = 'none';
+          cropperControls.style.display = 'none';
+          
+          // Create new File object for form submission
+          const file = new File([blob], 'profile-pic.jpg', { type: 'image/jpeg' });
+          const dataTransfer = new DataTransfer();
+          dataTransfer.items.add(file);
+          profilePicInput.files = dataTransfer.files;
+          
+          // Destroy cropper
+          cropper.destroy();
+
+          // Scroll back to show the registration button
+          document.querySelector('.btn-submit').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 'image/jpeg', 0.9);
+      }
+    });
+  </script>
+</body>
+</html>
